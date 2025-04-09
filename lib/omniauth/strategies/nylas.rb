@@ -13,6 +13,9 @@ module OmniAuth
       option :client_secret, ENV["NYLAS_APP_SECRET"]
       option :token_options, [:client_id, :client_secret]
 
+      # Added for OmniAuth 2.0 compatibility
+      option :provider_ignores_state, false
+
       uid { access_token.params["account_id"] }
 
       info do
@@ -21,6 +24,11 @@ module OmniAuth
           "email"      => access_token.params["email_address"],
           "provider"   => access_token.params["provider"]
         }
+      end
+      
+      # Handle CSRF protection for OmniAuth 2.0
+      def callback_url
+        options[:redirect_uri] || (full_host + callback_path)
       end
     end
   end

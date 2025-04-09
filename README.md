@@ -6,7 +6,7 @@
 [gem]: https://rubygems.org/gems/omniauth-nylas
 [travis]: http://travis-ci.org/kwbock/omniauth-nylas
 
-[OmniAuth](https://github.com/intridea/omniauth) Strategy for [nylas.com](nylas.com).
+[OmniAuth](https://github.com/intridea/omniauth) Strategy for [nylas.com](nylas.com). Compatible with OmniAuth 2.0.
 
 ## Installation
 
@@ -33,8 +33,11 @@ require "sinatra"
 require "omniauth"
 require "omniauth-nylas"
 
+# For OmniAuth 2.0, protect against CSRF
+OmniAuth.config.allowed_request_methods = [:post]
+
 class MyApplication < Sinatra::Base
-  use Rack::Session
+  use Rack::Session::Cookie, secret: ENV['SESSION_SECRET']
   use OmniAuth::Builder do
     provider :nylas, ENV['NYLAS_CLIENT_ID'], ENV['NYLAS_CLIENT_SECRET']
   end
@@ -44,6 +47,11 @@ end
 ### Rails
 In `config/initializers/omniauth.rb`
 ```ruby
+# For OmniAuth 2.0, protect against CSRF
+OmniAuth.config.allowed_request_methods = [:post]
+# If you need to test your app in development and don't want to post the form every time
+# OmniAuth.config.allowed_request_methods = [:post, :get] if Rails.env.development?
+
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider :nylas, ENV["NYLAS_CLIENT_ID"], ENV["NYLAS_CLIENT_SECRET"]
 end
